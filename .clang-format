@@ -1,0 +1,43 @@
+---
+Language: Cpp
+Standard: c++17
+BasedOnStyle: Google
+
+# Indentation.
+AccessModifierOffset: -2
+IndentWidth: 4
+IndentCaseBlocks: true
+IndentCaseLabels: false
+IndentWrappedFunctionNames: true
+
+# Alignments.]
+AlignAfterOpenBracket: BlockIndent
+AlignArrayOfStructures: Left
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: Consecutive
+
+# Type alignments.
+DerivePointerAlignment: false
+
+# Wrapping to single line.
+AllowShortBlocksOnASingleLine: Always
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AllowShortLambdasOnASingleLine: Inline
+
+# Newlines.
+BreakBeforeBraces: Allman
+BreakConstructorInitializers: AfterColon
+BreakInheritanceList: AfterColon
+ColumnLimit: 120
+EmptyLineAfterAccessModifier: Never
+EmptyLineBeforeAccessModifier: Always
+
+# Argument packing.
+BinPackArguments: false
+BinPackParameters: false
+
+SortIncludes: false
+
+...
