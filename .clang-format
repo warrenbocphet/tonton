@@ -20,7 +20,7 @@ AlignConsecutiveDeclarations: Consecutive
 DerivePointerAlignment: false
 
 # Wrapping to single line.
-AllowShortBlocksOnASingleLine: Always
+AllowShortBlocksOnASingleLine: false
 AllowShortEnumsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: AllIfsAndElse
