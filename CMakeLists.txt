@@ -1,8 +1,10 @@
 project(tonton)
 cmake_minimum_required(VERSION 3.22)
 
-set(CMAKE_CXX_STANDARD              20)
+set(CMAKE_CXX_STANDARD              17)
 set(CMAKE_CXX_STANDARD_REQUIRED     ON)
+
+add_subdirectory(fmt)
 
 # Setup rplidar as a target that can be used in target_link_libraries
 add_library(rplidar STATIC IMPORTED)
@@ -31,6 +33,7 @@ target_include_directories(${APP_NAME}
 target_link_libraries(${APP_NAME}
     PUBLIC
         rplidar
+        fmt
 )
 
 install(TARGETS ${APP_NAME})

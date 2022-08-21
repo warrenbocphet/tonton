@@ -2,3 +2,6 @@
 	path = rplidar_sdk
 	url = https://github.com/warrenbocphet/rplidar_sdk.git
 	branch = getAddressAsString-compiling-error
+[submodule "fmt"]
+	path = fmt
+	url = https://github.com/fmtlib/fmt.git
