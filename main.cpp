@@ -55,7 +55,11 @@ int main(int argc, char** argv)
     size_t                                  nodeCount = sizeof(nodes) / sizeof(sl_lidar_response_measurement_node_hq_t);
 
     if (SL_IS_OK(lidar->grabScanDataHq(nodes, nodeCount)))
-    {
+    {   
+        // We can get the radius (mm) and heading (angle) by
+        //  radius = nodes[0].dist_mm_q2 / (1 << 2)
+        //  angle = nodes[0].angle_z_q14 / (1 << 14)
+        
         std::cout << fmt::format("Grabbed {} lidar data.", nodeCount) << std::endl;
     }
     else
