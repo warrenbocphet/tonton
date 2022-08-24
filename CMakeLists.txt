@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD              17)
 set(CMAKE_CXX_STANDARD_REQUIRED     ON)
 
 add_subdirectory(fmt)
+add_subdirectory(grpc)
 
 # Setup rplidar as a target that can be used in target_link_libraries
 add_library(rplidar STATIC IMPORTED)
