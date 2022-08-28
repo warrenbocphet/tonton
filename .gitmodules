@@ -1,10 +1,10 @@
 [submodule "rplidar_sdk"]
-	path = rplidar_sdk
+	path = third_party/rplidar_sdk
 	url = https://github.com/warrenbocphet/rplidar_sdk.git
 	branch = getAddressAsString-compiling-error
-[submodule "fmt"]
-	path = fmt
-	url = https://github.com/fmtlib/fmt.git
 [submodule "grpc"]
-	path = grpc
+	path = third_party/grpc
 	url = https://github.com/grpc/grpc
+[submodule "third_party/fmt"]
+	path = third_party/fmt
+	url = https://github.com/fmtlib/fmt.git
