@@ -30,7 +30,7 @@ AllowShortLambdasOnASingleLine: Inline
 BreakBeforeBraces: Allman
 BreakConstructorInitializers: AfterColon
 BreakInheritanceList: AfterColon
-ColumnLimit: 120
+ColumnLimit: 80
 EmptyLineAfterAccessModifier: Never
 EmptyLineBeforeAccessModifier: Always
 

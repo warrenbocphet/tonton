@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+service Localisation {
+    rpc Communicate(stream SensorData) returns (stream Command) {}
+}
+
+message SensorData {
+    repeated double time = 1;
+    repeated double radius = 2;
+    repeated double heading = 3;
+}
+
+message Command {
+    // Empty for now
+}
