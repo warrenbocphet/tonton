@@ -87,17 +87,26 @@ ExternalProject_Add(grpc
   DEPENDS c-ares protobuf re2 zlib absl
 )
 
-# Setup rplidar as a target that can be used in target_link_libraries
-add_library(rplidar STATIC IMPORTED)
-
-set_property(TARGET rplidar
-  PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/third_party/rplidar_sdk/output/Linux/Release/libsl_lidar_sdk.a)
-
-target_include_directories(rplidar
-    INTERFACE
-        ${CMAKE_SOURCE_DIR}/rplidar_sdk/sdk/include
-        ${CMAKE_SOURCE_DIR}/rplidar_sdk/sdk/src
+# Builds rplidar_sdk project from the git submodule.
+ExternalProject_Add(rplidar_sdk
+  PREFIX rplidar_sdk
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/rplidar_sdk"
+  INSTALL_COMMAND ""
+  CMAKE_CACHE_ARGS
+        -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/rplidar_sdk
 )
+
+# Builds CLI11 project from the git submodule.
+ExternalProject_Add(CLI11
+  PREFIX CLI11
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/CLI11"
+  CMAKE_CACHE_ARGS
+        -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/CLI11
+        -DCLI11_BUILD_DOCS:BOOL=OFF
+        -DCLI11_BUILD_TESTS:BOOL=OFF
+        -DCLI11_BUILD_EXAMPLES:BOOL=OFF
+)
+
 ExternalProject_Add(localisation
   PREFIX libs
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/localisation"
@@ -114,6 +123,6 @@ ExternalProject_Add(localisation
         -Dabsl_DIR:STRING=${CMAKE_CURRENT_BINARY_DIR}/absl/lib/cmake/absl
         ${_CMAKE_ARGS_OPENSSL_ROOT_DIR}
         -DgRPC_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/grpc/lib/cmake/grpc
-  DEPENDS protobuf grpc
+  DEPENDS protobuf grpc rplidar_sdk
 )
 # 
