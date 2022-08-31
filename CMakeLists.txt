@@ -91,9 +91,9 @@ ExternalProject_Add(grpc
 ExternalProject_Add(rplidar_sdk
   PREFIX rplidar_sdk
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/rplidar_sdk"
-  INSTALL_COMMAND ""
   CMAKE_CACHE_ARGS
         -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/rplidar_sdk
+        -DCMAKE_BUILD_TYPE=Release
 )
 
 # Builds CLI11 project from the git submodule.
@@ -123,6 +123,7 @@ ExternalProject_Add(localisation
         -Dabsl_DIR:STRING=${CMAKE_CURRENT_BINARY_DIR}/absl/lib/cmake/absl
         ${_CMAKE_ARGS_OPENSSL_ROOT_DIR}
         -DgRPC_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/grpc/lib/cmake/grpc
+        -Drplidar_sdk_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/rplidar_sdk/lib/cmake/rplidar_sdk
   DEPENDS protobuf grpc rplidar_sdk
 )
 # 

@@ -21,7 +21,7 @@ target_link_libraries(${LIBRARY_NAME}
     PUBLIC
         gRPC::grpc++
         gRPC::grpc
-        rplidar_sdk
+        rplidar_sdk::rplidar_sdk
     PRIVATE
         fmt
 )
