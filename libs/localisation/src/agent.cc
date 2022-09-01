@@ -1,21 +1,62 @@
 #include "agent.h"
+#include "localisation.grpc.pb.h"
 
 #include <fmt/format.h>
+#include <thread>
 
 Agent::Agent(std::shared_ptr<grpc::Channel> channel) :
     stub_(Localisation::NewStub(channel))
 {
 }
 
-void Agent::communicate_with_server() {}
+void Agent::communicate_with_server()
+{
+    std::unique_lock<std::mutex> data_lock(data_mutex_);
+    grpc::ClientContext context;
+    auto interface = stub_->Communicate(&context);
+
+    while (true)
+    {
+        std::cout << fmt::format(
+                         "Number of data points to be transmitted: {}",
+                         time_.size()
+                     )
+                  << std::endl;
+
+        SensorData sensor_data;
+        // This condition variable will wait until it get notified.
+        // If there's data, it will try to acquire the lock and continue.
+        cv_.wait(data_lock, [this]() { return time_.size(); });
+        while (time_.size())
+        {
+            sensor_data.add_time(time_.front());
+            sensor_data.add_radius(radius_.front());
+            sensor_data.add_heading(heading_.front());
+
+            time_.pop();
+            radius_.pop();
+            heading_.pop();
+        }
+        interface->Write(sensor_data);
+    }
+}
 
 void Agent::connect_with_lidar(const std::string& addr, int baudrate)
 {
-    lidar_driver_ =
-        std::make_unique<sl::ILidarDriver>(*sl::createLidarDriver());
-    if (!SL_IS_OK(
-            lidar_driver_->connect(*sl::createSerialPortChannel(addr, baudrate))
-        ))
+    if (lidar_driver_ || lidar_channel_)
+    {
+        throw std::runtime_error(
+            "connect_with_lidar is unexpectedly called twice."
+        );
+    }
+
+    sl::ILidarDriver* ldrv = *sl::createLidarDriver();
+    lidar_driver_          = std::unique_ptr<sl::ILidarDriver>(ldrv);
+
+    sl::IChannel* channel = *sl::createSerialPortChannel(addr, baudrate);
+    lidar_channel_        = std::unique_ptr<sl::IChannel>(channel);
+
+    if (!SL_IS_OK(lidar_driver_->connect(lidar_channel_.get())))
     {
         throw std::runtime_error(fmt::format(
             "Failed to connect with lidar at \n\taddress: {}\n\tbaudrate: {}",
@@ -47,21 +88,26 @@ void Agent::read_data_from_lidar()
         std::cout << fmt::format("Grabbed {} lidar data.", node_count)
                   << std::endl;
         number_of_cotinuous_failure = 0;
+
+        // unlock mutex when exit scope
+        std::lock_guard<std::mutex> data_lock(data_mutex_);
         for (int i = 0; i < node_count; ++i)
         {
-            time_.push_back(
-                std::chrono::duration_cast<std::chrono::milliseconds>(
-                    std::chrono::system_clock::now().time_since_epoch()
-                )
-                    .count()
-            );
+            time_.push(std::chrono::duration_cast<std::chrono::milliseconds>(
+                           std::chrono::system_clock::now().time_since_epoch()
+            )
+                           .count());
 
-            radius_.push_back(nodes[i].dist_mm_q2 / (1 << 2));
-            angle_.push_back(nodes[i].angle_z_q14 / (1 << 14));
+            radius_.push(nodes[i].dist_mm_q2 / (1 << 2));
+            heading_.push(nodes[i].angle_z_q14 / (1 << 14));
         }
+        cv_.notify_one();
     }
     else
     {
         std::cout << "Failed to grab the scan data" << std::endl;
+        // A scan took about 150ms, and if we failed to get the data, just wait
+        // for a bit before try again to avoid high CPU usage.
+        std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
 }

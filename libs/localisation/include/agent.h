@@ -1,3 +1,6 @@
+#include <queue>
+#include <condition_variable>
+
 #include <grpcpp/grpcpp.h>
 #include "localisation.grpc.pb.h"
 #include "rplidar.h"
@@ -25,8 +28,12 @@ class Agent
     std::unique_ptr<Localisation::Stub> stub_;
 
     std::unique_ptr<sl::ILidarDriver> lidar_driver_;
+    std::unique_ptr<sl::IChannel>     lidar_channel_;
 
-    std::vector<double> time_;
-    std::vector<double> radius_;
-    std::vector<double> angle_;
+    std::queue<double> time_;
+    std::queue<double> radius_;
+    std::queue<double> heading_;
+
+    std::condition_variable cv_;
+    std::mutex data_mutex_;
 };

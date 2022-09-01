@@ -93,7 +93,7 @@ ExternalProject_Add(rplidar_sdk
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/rplidar_sdk"
   CMAKE_CACHE_ARGS
         -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/rplidar_sdk
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE:STRING=Release
 )
 
 # Builds CLI11 project from the git submodule.
