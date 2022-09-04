@@ -36,9 +36,9 @@ class localisationImpl : public Localisation::Service
     std::function<void(const std::string&, double, double, double)> callback_;
 };
 
-localisationServer::localisationServer(const std::string& addr) : addr_(addr) {}
+LocalisationServer::LocalisationServer(const std::string& addr) : addr_(addr) {}
 
-void localisationServer::append_data(
+void LocalisationServer::append_data(
     const std::string& /*agent_name*/,
     double time,
     double radius,
@@ -50,7 +50,7 @@ void localisationServer::append_data(
     heading_.push_back(heading);
 }
 
-void localisationServer::start_listening()
+void LocalisationServer::start_listening()
 {
     grpc::ServerBuilder server_builder;
     server_builder.AddListeningPort(addr_, grpc::InsecureServerCredentials());
@@ -74,7 +74,7 @@ void localisationServer::start_listening()
     std::cout << "Server has shutdowned" << std::endl;
 }
 
-void localisationServer::shutdown()
+void LocalisationServer::shutdown()
 {
     server_->Shutdown();
 }

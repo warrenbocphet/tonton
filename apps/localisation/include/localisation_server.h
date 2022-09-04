@@ -2,10 +2,10 @@
 
 #include <grpcpp/grpcpp.h>
 
-class localisationServer : public Localisation::Service
+class LocalisationServer : public Localisation::Service
 {
   public:
-    localisationServer(const std::string& addr);
+    LocalisationServer(const std::string& addr);
 
     void append_data(
         const std::string& agent_name,

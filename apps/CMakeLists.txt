@@ -1,0 +1,2 @@
+add_subdirectory(localisation)
+add_subdirectory(server_cli)

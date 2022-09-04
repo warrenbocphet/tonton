@@ -1,5 +1,3 @@
-project(localisation)
-
 set(LIBRARY_NAME localisation)
 
 add_library(${LIBRARY_NAME} 
@@ -14,15 +12,11 @@ add_library(${LIBRARY_NAME}
         src/agent.cc
 )
 
-find_package(gRPC CONFIG REQUIRED)
-find_package(rplidar_sdk CONFIG REQUIRED)
-
 target_link_libraries(${LIBRARY_NAME} 
     PUBLIC
-        gRPC::grpc++
-        gRPC::grpc
-        rplidar_sdk::rplidar_sdk
-    PRIVATE
+        grpc++
+        grpc
+        rplidar_sdk
         fmt
 )
 
