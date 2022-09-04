@@ -1,6 +1,5 @@
 #include <CLI/CLI.hpp>
 #include <fmt/format.h>
-#include <iostream>
 #include <string>
 
 #include "localisation_server.h"
@@ -16,5 +15,7 @@ int main(int argc, char** argv)
 
     CLI11_PARSE(app, argc, argv);
 
-    LocalisationServer(fmt::format("{}:{}", addr, port));
+    LocalisationServer server(fmt::format("{}:{}", addr, port));
+
+    server.start_listening();
 }
