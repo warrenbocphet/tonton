@@ -12,17 +12,11 @@ Agent::Agent(std::shared_ptr<grpc::Channel> channel) :
 void Agent::communicate_with_server()
 {
     std::unique_lock<std::mutex> data_lock(data_mutex_);
-    grpc::ClientContext context;
-    auto interface = stub_->Communicate(&context);
+    grpc::ClientContext          context;
+    auto                         interface = stub_->Communicate(&context);
 
     while (true)
     {
-        std::cout << fmt::format(
-                         "Number of data points to be transmitted: {}",
-                         time_.size()
-                     )
-                  << std::endl;
-
         SensorData sensor_data;
         // This condition variable will wait until it get notified.
         // If there's data, it will try to acquire the lock and continue.
@@ -66,7 +60,7 @@ void Agent::connect_with_lidar(const std::string& addr, int baudrate)
     }
 }
 
-void Agent::read_data_from_lidar()
+void Agent::continuously_read_data_from_lidar()
 {
     sl::LidarScanMode scan_mode;
     if (SL_IS_OK(lidar_driver_->startScan(false, true, 0, &scan_mode)))
@@ -83,31 +77,37 @@ void Agent::read_data_from_lidar()
         sizeof(nodes) / sizeof(sl_lidar_response_measurement_node_hq_t);
 
     int number_of_cotinuous_failure = 0;
-    if (SL_IS_OK(lidar_driver_->grabScanDataHq(nodes, node_count)))
+    while (number_of_cotinuous_failure < 3)
     {
-        std::cout << fmt::format("Grabbed {} lidar data.", node_count)
-                  << std::endl;
-        number_of_cotinuous_failure = 0;
-
-        // unlock mutex when exit scope
-        std::lock_guard<std::mutex> data_lock(data_mutex_);
-        for (int i = 0; i < node_count; ++i)
+        if (SL_IS_OK(lidar_driver_->grabScanDataHq(nodes, node_count)))
         {
-            time_.push(std::chrono::duration_cast<std::chrono::milliseconds>(
-                           std::chrono::system_clock::now().time_since_epoch()
-            )
-                           .count());
+            std::cout << fmt::format("Grabbed {} lidar data.", node_count)
+                      << std::endl;
+            number_of_cotinuous_failure = 0;
 
-            radius_.push(nodes[i].dist_mm_q2 / (1 << 2));
-            heading_.push(nodes[i].angle_z_q14 / (1 << 14));
+            // unlock mutex when exit scope
+            std::lock_guard<std::mutex> data_lock(data_mutex_);
+            for (int i = 0; i < node_count; ++i)
+            {
+                time_.push(
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch()
+                    )
+                        .count()
+                );
+
+                radius_.push(nodes[i].dist_mm_q2 / (1 << 2));
+                heading_.push(nodes[i].angle_z_q14 / (1 << 14));
+            }
+            cv_.notify_one();
         }
-        cv_.notify_one();
-    }
-    else
-    {
-        std::cout << "Failed to grab the scan data" << std::endl;
-        // A scan took about 150ms, and if we failed to get the data, just wait
-        // for a bit before try again to avoid high CPU usage.
-        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        else
+        {
+            ++number_of_cotinuous_failure;
+            std::cout << "Failed to grab the scan data" << std::endl;
+            // A scan took about 150ms, and if we failed to get the data, just
+            // wait for a bit before try again to avoid high CPU usage.
+            std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        }
     }
 }

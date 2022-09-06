@@ -22,7 +22,7 @@ class Agent
     void connect_with_lidar(const std::string& addr, int baudrate);
 
     /// Read data from LIDAR through RPILidar's SDK.
-    void read_data_from_lidar();
+    void continuously_read_data_from_lidar();
 
   private:
     std::unique_ptr<Localisation::Stub> stub_;
@@ -35,5 +35,5 @@ class Agent
     std::queue<double> heading_;
 
     std::condition_variable cv_;
-    std::mutex data_mutex_;
+    std::mutex              data_mutex_;
 };

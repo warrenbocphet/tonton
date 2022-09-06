@@ -23,7 +23,7 @@ int main(int argc, char** argv)
     agent.connect_with_lidar("/dev/ttyUSB0", 115200);
 
     auto read_data_thread =
-        std::thread([&agent]() { agent.read_data_from_lidar(); });
+        std::thread([&agent]() { agent.continuously_read_data_from_lidar(); });
     auto communicate_thread =
         std::thread([&agent]() { agent.communicate_with_server(); });
 
