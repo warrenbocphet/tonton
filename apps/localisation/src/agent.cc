@@ -96,8 +96,12 @@ void Agent::continuously_read_data_from_lidar()
                         .count()
                 );
 
-                radius_.push(nodes[i].dist_mm_q2 / (1 << 2));
-                heading_.push(nodes[i].angle_z_q14 / (1 << 14));
+                radius_.push(
+                    static_cast<double>(nodes[i].dist_mm_q2) / 4.0f
+                );
+                heading_.push(
+                    static_cast<double>(nodes[i].angle_z_q14) * 1.5708 / 16384.f
+                );
             }
             cv_.notify_one();
         }

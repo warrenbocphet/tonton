@@ -8,5 +8,4 @@ void Visualiser::draw(
 )
 {
     matplot::scatter(x, y, 1);
-    matplot::axis(matplot::equal);
 }

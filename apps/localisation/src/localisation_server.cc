@@ -61,8 +61,8 @@ void LocalisationServer::process_data(
 
     for (size_t i = 0; i < radius.size(); ++i)
     {
-        x.push_back(radius[i] * cos(heading[i] / 180 * 3.14159265));
-        y.push_back(radius[i] * sin(heading[i] / 180 * 3.14159265));
+        x.push_back(radius[i] * cos(heading[i]));
+        y.push_back(radius[i] * sin(heading[i]));
     }
 
     vis_.draw(x, y);
