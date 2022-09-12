@@ -8,6 +8,7 @@ add_subdirectory(third_party/CLI11)
 add_subdirectory(third_party/fmt)
 add_subdirectory(third_party/grpc)
 add_subdirectory(third_party/rplidar_sdk)
+add_subdirectory(third_party/matplotplusplus)
 
 add_subdirectory(apps)
 
