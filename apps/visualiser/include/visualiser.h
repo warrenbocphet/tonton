@@ -1,3 +1,5 @@
+#include <vector>
+
 class Visualiser
 {
   public:

@@ -1,10 +1,12 @@
 #include <matplot/matplot.h>
-
 #include "visualiser.h"
 
-Visualiser::Visualiser() {};
+Visualiser::Visualiser(){};
 
-void Visualiser::draw(const std::vector<double>& x, const std::vector<double>& y)
+void Visualiser::draw(
+    const std::vector<double>& x, const std::vector<double>& y
+)
 {
-    matplot::scatter(x, y);
+    matplot::scatter(x, y, 1);
+    matplot::axis(matplot::equal);
 }

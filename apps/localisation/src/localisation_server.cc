@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <functional>
+#include <algorithm>
 #include <fmt/format.h>
 
 class localisationImpl : public Localisation::Service
@@ -26,28 +27,45 @@ class localisationImpl : public Localisation::Service
             std::cout << fmt::format("\tadding {} data point", data.time_size())
                       << std::endl;
 
-            for (int i = 0; i < data.time_size(); ++i)
-            {
-                callback_("", data.time(i), data.radius(i), data.heading(i));
-            }
+            callback_(
+                "",
+                std::vector<double>{data.time().begin(), data.time().end()},
+                std::vector<double>{data.radius().begin(), data.radius().end()},
+                std::vector<double>{
+                    data.heading().begin(), data.heading().end()}
+            );
         }
+
+        return grpc::Status::OK;
     }
 
-    std::function<void(const std::string&, double, double, double)> callback_;
+    std::function<
+        void(const std::string&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&)>
+        callback_;
 };
 
 LocalisationServer::LocalisationServer(const std::string& addr) : addr_(addr) {}
 
-void LocalisationServer::append_data(
+void LocalisationServer::process_data(
     const std::string& /*agent_name*/,
-    double time,
-    double radius,
-    double heading
+    const std::vector<double>& /*time*/,
+    const std::vector<double>& radius,
+    const std::vector<double>& heading
 )
 {
-    time_.push_back(time);
-    radius_.push_back(radius);
-    heading_.push_back(heading);
+    std::vector<double> x;
+    std::vector<double> y;
+
+    x.reserve(radius.size());
+    y.reserve(radius.size());
+
+    for (size_t i = 0; i < radius.size(); ++i)
+    {
+        x.push_back(radius[i] * cos(heading[i] / 180 * 3.14159265));
+        y.push_back(radius[i] * sin(heading[i] / 180 * 3.14159265));
+    }
+
+    vis_.draw(x, y);
 }
 
 void LocalisationServer::start_listening()
@@ -57,13 +75,13 @@ void LocalisationServer::start_listening()
 
     localisationImpl service;
     service.callback_ = [this](
-                            const std::string& agent_name,
-                            double             time,
-                            double             radius,
-                            double             heading
+                            const std::string&         agent_name,
+                            const std::vector<double>& time,
+                            const std::vector<double>& radius,
+                            const std::vector<double>& heading
                         )
     {
-        append_data(agent_name, time, radius, heading);
+        process_data(agent_name, time, radius, heading);
     };
 
     server_builder.RegisterService(&service);
