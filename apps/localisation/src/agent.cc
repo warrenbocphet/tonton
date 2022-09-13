@@ -81,7 +81,16 @@ void Agent::continuously_read_data_from_lidar()
     {
         if (SL_IS_OK(lidar_driver_->grabScanDataHq(nodes, node_count)))
         {
-            std::cout << fmt::format("Grabbed {} lidar data.", node_count)
+            float frequency = -1;
+            lidar_driver_->getFrequency(
+                scan_mode, nodes, node_count, frequency
+            );
+
+            std::cout << fmt::format(
+                             "Grabbed {} lidar data, frequency: {}.",
+                             node_count,
+                             frequency
+                         )
                       << std::endl;
             number_of_cotinuous_failure = 0;
 
@@ -96,9 +105,7 @@ void Agent::continuously_read_data_from_lidar()
                         .count()
                 );
 
-                radius_.push(
-                    static_cast<double>(nodes[i].dist_mm_q2) / 4.0f
-                );
+                radius_.push(static_cast<double>(nodes[i].dist_mm_q2) / 4.0f);
                 heading_.push(
                     static_cast<double>(nodes[i].angle_z_q14) * 1.5708 / 16384.f
                 );
