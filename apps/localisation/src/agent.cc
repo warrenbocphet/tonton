@@ -31,7 +31,10 @@ void Agent::communicate_with_server()
             radius_.pop();
             heading_.pop();
         }
-        interface->Write(sensor_data);
+        if (!interface->Write(sensor_data))
+        {
+            throw std::runtime_error("False to write data, stream has closed.");
+        }
     }
 }
 
